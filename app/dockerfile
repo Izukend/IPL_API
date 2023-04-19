@@ -1,0 +1,11 @@
+FROM python:bullseye
+
+RUN pip install -v --no-cache-dir cython ipython mysql-connector-python  uwsgi PyJWT gunicorn
+RUN pip install -v --no-build-isolation --no-binary :all: falcon
+RUN pip install SQLAlchemy
+
+COPY sentinel/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+
+WORKDIR /app/sentinel
+CMD ["uwsgi", "uwsgi.ini"]

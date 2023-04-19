@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  falcon_api:
+    build: ./app
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app
+    expose:
+      - 8090
+    working_dir: /app/sentinel
+    command: gunicorn --reload sentinel.app --bind 0.0.0.0:8090
+    labels:
+      - "traefik.http.routers.sentinel.rule=Host(`sentinel.lab.it`)"
+      - "traefik.http.services.sentinel.loadbalancer.server.port=8090"
+    env_file:
+      - .env
+
+  falcon_proxy:
+    image: traefik:v2.8
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8080:8080"
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
