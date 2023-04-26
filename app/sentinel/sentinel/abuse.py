@@ -37,7 +37,7 @@ class Abuse_report:
 
         if self._params['dt_start'] == None:
             dt = self._params['dt_end'].astimezone(self._tz)
-            self._params['dt_start'] = dt.replace(minute=0, hour=0, second=0)
+            self._params['dt_start'] = dt.replace(minute=0, hour=0, second=0,microsecond=0)
 
     def create_jobs(self):
         job_start = job_end = self._params['dt_start']
@@ -140,7 +140,6 @@ class Abuse_report:
         except:
             pass
 
-        # self._params['dt_start'] = datetime.fromisoformat('2023-04-17 00:00:00')
         self.init_time_frame()
         self.create_jobs()
 
