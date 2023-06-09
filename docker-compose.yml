@@ -8,11 +8,12 @@ services:
       - type: bind
         source: ./app
         target: /app
-    # tty: true
+    user: root  # Ajout de l'option user: root pour le service falcon_api
     expose:
       - 8090
     ports:
-       - 80:8000
+      - 8000:80
+      - 80:8000
     working_dir: /app/ipl_api
     command: gunicorn --reload ipl_api.app --bind 0.0.0.0:8000
     depends_on:
@@ -20,8 +21,11 @@ services:
         condition: service_healthy
 
   mysql:
+    user: root
     build: db/
     container_name: db
+    cap_add:
+      - SYS_NICE
     ports:
       - 3306:3306
     volumes:

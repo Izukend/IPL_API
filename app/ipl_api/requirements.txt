@@ -7,3 +7,4 @@ urllib3==1.26.15
 pytz==2023.3
 six==1.15.0
 sqlparse==0.4.2
+sqlalchemy==1.4.36;
