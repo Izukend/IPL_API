@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  falcon_api:
+    container_name: falcon_api
+    build: ./app
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app
+    # tty: true
+    expose:
+      - 8090
+    ports:
+       - 80:8000
+    working_dir: /app/ipl_api
+    command: gunicorn --reload ipl_api.app --bind 0.0.0.0:8000
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    build: db/
+    container_name: db
+    ports:
+      - 3306:3306
+    volumes:
+      - data-volume:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=falcon_bdd
+    healthcheck:
+      test: "exit 0"
+
+volumes:
+  data-volume:
