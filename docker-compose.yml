@@ -2,27 +2,39 @@ version: '3.8'
 
 services:
   falcon_api:
+    container_name: falcon_api
     build: ./app
     volumes:
       - type: bind
         source: ./app
         target: /app
+    user: root  # Ajout de l'option user: root pour le service falcon_api
     expose:
       - 8090
-    working_dir: /app/sentinel
-    command: gunicorn --reload sentinel.app --bind 0.0.0.0:8090
-    labels:
-      - "traefik.http.routers.sentinel.rule=Host(`sentinel.lab.it`)"
-      - "traefik.http.services.sentinel.loadbalancer.server.port=8090"
-    env_file:
-      - .env
-
-  falcon_proxy:
-    image: traefik:v2.8
-    command: --api.insecure=true --providers.docker
     ports:
-      - "8080:8080"
-      - "80:80"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - 8000:80
+      - 80:8000
+    working_dir: /app/ipl_api
+    command: gunicorn --reload ipl_api.app --bind 0.0.0.0:8000
+    depends_on:
+      mysql:
+        condition: service_healthy
 
+  mysql:
+    user: root
+    build: db/
+    container_name: db
+    cap_add:
+      - SYS_NICE
+    ports:
+      - 3306:3306
+    volumes:
+      - data-volume:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=falcon_bdd
+    healthcheck:
+      test: "exit 0"
+
+volumes:
+  data-volume:
