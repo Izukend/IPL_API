@@ -4,15 +4,15 @@ IPL_API is a Python API to facilitate the display of films in the Ice room of th
 
 ## Getting started
 
-Install docker for windows.
+Install docker for windows :
 
 - [Docker.com](https://www.docker.com/)
 
-Install WSL on windows.
+Install WSL on windows :
 
 - [WSL](https://learn.microsoft.com/fr-fr/windows/wsl/install)
 
-Finally, install docker on wsl distrib.
+Finally, install docker on wsl distrib :
 
 ```bash
 $ sudo apt update
@@ -23,6 +23,9 @@ $ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ub
 $ sudo apt update
 $ sudo apt install docker-ce
 ```
+Install application for request methods :
+
+- [Insomnia](https://insomnia.rest/)
 ## Use the API
 
 If you want to use the API you would first need to host it locally on your pc or a server on your LAN.
