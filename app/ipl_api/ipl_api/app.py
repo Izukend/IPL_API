@@ -92,20 +92,21 @@ class APIServeurs:
 
     def on_post(self, req, resp):
         try:
+            # Récupérer les données JSON de la requête
+            data = json.loads(req.stream.read())
             # Récupérer la valeur de l'en-tête X-Forwarded-For
-            forwarded_host = req.access_route
-            
-            if forwarded_host:
+            x_forwarded_for = req.headers.get('X-Forwarded-For')
+            if x_forwarded_for:
             # La valeur de X-Forwarded-For est présente, extraire la première adresse IP
-                ip_addresses = forwarded_host.split(',')
+                ip_addresses = x_forwarded_for
                 client_ip = ip_addresses[0].strip()
             else:
             # La valeur de X-Forwarded-For est absente, utiliser l'adresse IP directe du client
                 client_ip = req.remote_addr
 
             # Ajouter l'adresse IP du client à la table correspondante de la base de données
-            public_ip_obj = Serveurs(public_ip=client_ip)
-            session.add(public_ip_obj)
+            data_add_srv = Serveurs(private_ip=client_ip, name=data['name'], version_sw=data['version_sw'])
+            session.add(data_add_srv)
             session.commit()
 
             resp.status = falcon.HTTP_200
