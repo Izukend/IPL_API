@@ -14,7 +14,7 @@ class TokenAuthMiddleware:
     def process_request(self, req, resp):
         token = req.get_header('Authorization')
         if token and token == f'Bearer {TOKEN}':
-            req.context['user'] = {'username': 'tom'}
+            req.context['user'] = {'username': 'izukend'}
         else:
             raise falcon.HTTPUnauthorized('Authentication required', 'Token authentication failed')
         
