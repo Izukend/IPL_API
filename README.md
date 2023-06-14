@@ -33,8 +33,8 @@ $ docker-compose up --build
 ```
 Make sure you are at the root of the project.
 ## Used By
-
 This project is used by the following companies:
 
 - CGR Cinemas
-/!\ -> This project is not finished, the final version is used, not this one
+
+##### /!\ -> This project is not finished, the final version is used, not this one.
