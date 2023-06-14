@@ -2,23 +2,25 @@ version: '3.8'
 
 services:
   falcon_api:
-    container_name: falcon_api
+    #container_name: falcon_api
     build: ./app
     volumes:
       - type: bind
         source: ./app
         target: /app
-    user: root  # Ajout de l'option user: root pour le service falcon_api
+    user: root  
     expose:
       - 8090
-    ports:
-      - 8000:80
-      - 80:8000
     working_dir: /app/ipl_api
     command: gunicorn --reload ipl_api.app --bind 0.0.0.0:8000
+    labels:
+      - "traefik.http.routers.ipl_api.rule=Host(`test-api.lab.it`)"
+      - "traefik.http.services.ipl_api.loadbalancer.server.port=8000"
     depends_on:
       mysql:
         condition: service_healthy
+    deploy:
+      replicas: 2
 
   mysql:
     user: root
@@ -35,6 +37,15 @@ services:
       - MYSQL_DATABASE=falcon_bdd
     healthcheck:
       test: "exit 0"
+
+  proxy:
+    image: traefik:v2.8
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8080:8080"
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   data-volume:
