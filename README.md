@@ -1,6 +1,6 @@
 # IPL_API
 
-IPL_API is a Python API to facilitate the display of films in the Ice room of the CGR CINEMAS
+IPL_API is a Python API to facilitate the display of films in the Ice room of the CGR CINEMAS.
 
 ## Getting started
 
@@ -23,10 +23,18 @@ $ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ub
 $ sudo apt update
 $ sudo apt install docker-ce
 ```
+## Use the API
 
+If you want to use the API you would first need to host it locally on your pc or a server on your LAN.
+
+On the device in question use the following command in WSL terminal :
+```bash
+$ docker-compose up --build
+```
+Make sure you are at the root of the project.
 ## Used By
 
 This project is used by the following companies:
-/!\ -> This project is not finished, the final version is used, not this one
 
 - CGR Cinemas
+/!\ -> This project is not finished, the final version is used, not this one
