@@ -6,7 +6,7 @@ from datetime import datetime
 
 srv = Servers.__table__
 
-#Transforme le DateTime en string pour pouvoir l'afficher avec la méthode GET
+# Convert DateTime to a string to display it using the GET method
 class DateTime:
     @staticmethod
     def json_serial(obj):
@@ -23,9 +23,9 @@ class Servers_data:
     def on_post(self, req, resp):
         from ipl_api.app import session
         try:
-            # Récupérer les données JSON de la requête
+            # Retrieve JSON data from the request
             data = json.loads(req.stream.read())
-            # Récupérer la valeur de l'en-tête X-Forwarded-For
+            # Retrieve the value of the X-Forwarded-For header
             x_forwarded_for = req.access_route
             for x_forwarded_for in x_forwarded_for:
                 if x_forwarded_for != '127.0.0.1' and x_forwarded_for != '::1':
@@ -34,7 +34,7 @@ class Servers_data:
                 else:
                     client_ip = req.remote_addr
             
-            # Ajouter l'adresse IP du client à la table correspondante de la base de données
+            # Add the client's IP address to the corresponding table in the database
             data_add_srv = Servers(private_ip=client_ip, name=data['name'], version_sw=data['version_sw'])
             session.add(data_add_srv)
             session.commit()
@@ -43,30 +43,30 @@ class Servers_data:
             resp.body = 'Data successfully received and saved.'
 
         except SQLAlchemyError as e:
-            # En cas d'erreur SQLAlchemy, effectuer un rollback de la session
+            # In case of a SQLAlchemy error, perform a session rollback
             session.rollback()
 
             resp.status = falcon.HTTP_500
             resp.body = f'Error occurred while saving data: {str(e)}'
         except Exception as e:
-            # En cas d'erreur non SQLAlchemy, renvoyer une erreur 500 Internal Server Error
+            # In case of a non-SQLAlchemy error, return a 500 Internal Server Error
             resp.status = falcon.HTTP_500
             resp.body = f'Error occurred: {str(e)}'
 
     def on_get(self, req, resp):
         from ipl_api.app import session
-        # Récupérer l'utilisateur authentifié à partir du contexte de la requête
+        # Retrieve the authenticated user from the request context
         user = req.context['user']
         resp.body = f'Authenticated user: {user["username"]}'
         resp.status = falcon.HTTP_200
 
-        # Exécuter une requête SQLAlchemy pour récupérer les données de la table correspondante
+        # Execute a SQLAlchemy query to retrieve data from the corresponding table
         query = self.table.select()
         result = session.execute(query)
 
-        # Convertir les lignes de résultat en une liste de dictionnaires
+        # Convert the result rows into a list of dictionaries
         rows = [dict(row) for row in result]
 
-        # Renvoyer les données sous forme de JSON dans le corps de la réponse
+        # Return the data as JSON in the response body, with DateTime converted to a string
         resp.body = json.dumps(rows, default=DateTime.json_serial)
         resp.status = falcon.HTTP_200
