@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from ipl_api.models import Cpl
 
 cpl = Cpl.__table__
+
 class Cpl_data:
     def __init__(self, table):
         self.post_data = []
@@ -26,7 +27,7 @@ class Cpl_data:
 
             resp.status = falcon.HTTP_200
             resp.body = 'Data successfully received and saved.'
-            
+
         except SQLAlchemyError as e:
             # En cas d'erreur SQLAlchemy, effectuer un rollback de la session
             session.rollback()
