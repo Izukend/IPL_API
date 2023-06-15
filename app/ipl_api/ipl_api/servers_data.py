@@ -6,13 +6,14 @@ from datetime import datetime
 
 srv = Servers.__table__
 
+#Transforme le DateTime en string pour pouvoir l'afficher avec la méthode GET
 class DateTime:
     @staticmethod
     def json_serial(obj):
         if isinstance(obj, datetime):
             return obj.strftime('%Y-%m-%d %H:%M:%S')
         raise TypeError("Type not serializable")
-    
+
 class Servers_data:
 
     def __init__(self, table):
@@ -32,13 +33,7 @@ class Servers_data:
                     break
                 else:
                     client_ip = req.remote_addr
-            """
-            if x_forwarded_for:
-                ip_addresses = x_forwarded_for
-                client_ip = ip_addresses[0]
-            else:
-                client_ip = req.remote_addr
-"""
+            
             # Ajouter l'adresse IP du client à la table correspondante de la base de données
             data_add_srv = Servers(private_ip=client_ip, name=data['name'], version_sw=data['version_sw'])
             session.add(data_add_srv)
@@ -46,7 +41,7 @@ class Servers_data:
 
             resp.status = falcon.HTTP_200
             resp.body = 'Data successfully received and saved.'
-            
+
         except SQLAlchemyError as e:
             # En cas d'erreur SQLAlchemy, effectuer un rollback de la session
             session.rollback()
@@ -57,6 +52,7 @@ class Servers_data:
             # En cas d'erreur non SQLAlchemy, renvoyer une erreur 500 Internal Server Error
             resp.status = falcon.HTTP_500
             resp.body = f'Error occurred: {str(e)}'
+
     def on_get(self, req, resp):
         from ipl_api.app import session
         # Récupérer l'utilisateur authentifié à partir du contexte de la requête
@@ -67,7 +63,7 @@ class Servers_data:
         # Exécuter une requête SQLAlchemy pour récupérer les données de la table correspondante
         query = self.table.select()
         result = session.execute(query)
-        
+
         # Convertir les lignes de résultat en une liste de dictionnaires
         rows = [dict(row) for row in result]
 
