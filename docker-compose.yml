@@ -10,7 +10,7 @@ services:
         target: /app
     user: root  
     expose:
-      - 8090
+      - 8000
     working_dir: /app/ipl_api
     command: gunicorn --reload ipl_api.app --bind 0.0.0.0:8000
     labels:
@@ -46,6 +46,6 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-
+    #network_mode: "host"
 volumes:
   data-volume:
