@@ -2,9 +2,17 @@ import falcon
 import json
 from sqlalchemy.exc import SQLAlchemyError
 from ipl_api.models import Servers
+from datetime import datetime
 
 srv = Servers.__table__
 
+class DateTime:
+    @staticmethod
+    def json_serial(obj):
+        if isinstance(obj, datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        raise TypeError("Type not serializable")
+    
 class Servers_data:
 
     def __init__(self, table):
@@ -49,3 +57,20 @@ class Servers_data:
             # En cas d'erreur non SQLAlchemy, renvoyer une erreur 500 Internal Server Error
             resp.status = falcon.HTTP_500
             resp.body = f'Error occurred: {str(e)}'
+    def on_get(self, req, resp):
+        from ipl_api.app import session
+        # Récupérer l'utilisateur authentifié à partir du contexte de la requête
+        user = req.context['user']
+        resp.body = f'Authenticated user: {user["username"]}'
+        resp.status = falcon.HTTP_200
+
+        # Exécuter une requête SQLAlchemy pour récupérer les données de la table correspondante
+        query = self.table.select()
+        result = session.execute(query)
+        
+        # Convertir les lignes de résultat en une liste de dictionnaires
+        rows = [dict(row) for row in result]
+
+        # Renvoyer les données sous forme de JSON dans le corps de la réponse
+        resp.body = json.dumps(rows, default=DateTime.json_serial)
+        resp.status = falcon.HTTP_200
