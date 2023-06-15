@@ -12,16 +12,16 @@ class Cpl_data:
 
     def on_post(self, req, resp):
         from ipl_api.app import session
-        # Récupérer l'utilisateur authentifié à partir du contexte de la requête
+        # Retrieve the authenticated user from the request context
         user = req.context['user']
         resp.body = f'Authenticated user: {user["username"]}'
         resp.status = falcon.HTTP_200
         try:
-            # Récupérer les données JSON de la requête
+            # Retrieve JSON data from the request
             data = json.loads(req.stream.read())
             data_add = Cpl(uid=data['uid'], name=data['name'])
 
-            # Ajouter les données à la session SQLAlchemy et les sauvegarder dans la base de données
+            # Add the data to the SQLAlchemy session and save it to the database
             session.add(data_add)
             session.commit()
 
@@ -29,30 +29,30 @@ class Cpl_data:
             resp.body = 'Data successfully received and saved.'
 
         except SQLAlchemyError as e:
-            # En cas d'erreur SQLAlchemy, effectuer un rollback de la session
+            # In case of a SQLAlchemy error, perform a session rollback
             session.rollback()
 
             resp.status = falcon.HTTP_500
             resp.body = f'Error occurred while saving data: {str(e)}'
         except Exception as e:
-            # En cas d'erreur non SQLAlchemy, renvoyer une erreur 500 Internal Server Error
+            # In case of a non-SQLAlchemy error, return a 500 Internal Server Error
             resp.status = falcon.HTTP_500
             resp.body = f'Error occurred: {str(e)}'
 
     def on_get(self, req, resp):
         from ipl_api.app import session
-        # Récupérer l'utilisateur authentifié à partir du contexte de la requête
+        # Retrieve the authenticated user from the request context
         user = req.context['user']
         resp.body = f'Authenticated user: {user["username"]}'
         resp.status = falcon.HTTP_200
 
-        # Exécuter une requête SQLAlchemy pour récupérer les données de la table correspondante
+        # Execute a SQLAlchemy query to retrieve data from the corresponding table
         query = self.table.select()
         result = session.execute(query)
 
-        # Convertir les lignes de résultat en une liste de dictionnaires
+        # Convert the result rows into a list of dictionaries
         rows = [dict(row) for row in result]
 
-        # Renvoyer les données sous forme de JSON dans le corps de la réponse
+        # Return the data as JSON in the response body
         resp.body = json.dumps(rows)
         resp.status = falcon.HTTP_200
