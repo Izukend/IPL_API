@@ -6,14 +6,14 @@ from ipl_api.cpl_data import Cpl_data, cpl
 from ipl_api.regions_data import Regions_data, regions
 from ipl_api.models import Base
 # Définition du token d'authentification
-TOKEN = 'testn'
+TOKEN = 'githubtoken'
 
 class TokenAuthMiddleware:
     def process_request(self, req, resp):
 
         token = req.get_header('Authorization')
         if token and token == f'Bearer {TOKEN}':
-            req.context['user'] = {'username': 'tom'}
+            req.context['user'] = {'username': 'izukend'}
         else:
             raise falcon.HTTPUnauthorized('Authentication required', 'Token authentication failed')
 
